@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Segmentation Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.3.0/min/dropzone.min.js"></script>
+    <style type="text/css">
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #003262;
+        }
+
+        .container {
+            margin: 0 auto;
+            max-width: 960px;
+            padding: 0 10px;
+        }
+
+        header {
+            background-color: #2894FF;
+            padding: 20px 0;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            color: #FDB515;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: white;
+        }
+
+        #my-dropzone {
+            border: 2px dashed #DDD5C7;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+
+        #my-dropzone.dz-drag-hover {
+            border: 2px dashed #00B0DA;
+        }
+
+        a {
+            color: #00B0DA;
+        }
+
+        .dz-details,
+        .dz-progress,
+        .dz-success-mark,
+        .dz-error-mark {
+            display: none;
+        }
+
+        input[type="text"] {
+            border: 2px solid #DDD5C7;
+            font-size: 1.5rem;
+            padding: 10px;
+            outline: none;
+            border-radius: 3px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"]:focus {
+            border-color: #00B0DA;
+        }
+
+        #viz {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #viz img {
+            height: 480px;
+            border: 1px solid #003262;
+        }
+
+        #status {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        hr {
+            height: 0;
+            border: 0;
+            border-bottom: 1px solid #DDD5C7;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <p> <img src="static/head.png" width=100% /> </p> -->
+    <header>
+        <div class="container">
+            <h1>Segmentaton Demo</h1>
+            <p>Media Analytics and Computing.</p>
+        </div>
+    </header>
+    <div class="container">
+        <form action="/img_upload" class="dropzone" id="my-dropzone">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+        </form>
+        <div id="viz"></div>
+        <div id="status"></div>
+        <footer>
+            <p>System created by <a href="http://mac.xmu.edu.cn/index.php">MAC Lab,</a> <a href="https://www.xmu.edu.cn/">XMU</a></p>
+        </footer>
+    </div>
+
+    <script type="text/javascript">
+        Dropzone.options.myDropzone = {
+            init: function () {
+                this.on('addedfile', function () {
+                    $('.dz-default').hide();
+                    $('#status').text('Computing...');
+                });
+                this.on('removedfile', function () {
+                    $('.dz-default').show();
+                    clearResponse();
+                });
+                this.on('success', function (file, response) {
+                    if (typeof response == "string")
+                        response = strToJson(response);
+                    console.log(response);
+                    if (response.error) {
+                        this.removeAllFiles();
+                        alert(response.error);
+                    } else {
+                        $('#viz').html('<img src="data:image/jpeg;base64,' + response.viz + '"/>');
+                        // $('#viz').html("<img src=static/head.png>");
+                        // document.getElementById("viz").innerHTML='<img src="data:image/jpeg;base64,' + response.viz + '"/>'; // " height="100" width="100"
+                        $('#status').text('Took ' + response.status + ' sec');
+                    }
+                });
+                this.on('error', function (file, message, xhr) {
+                    alert(message);
+                });
+                this.on('drop', function () {
+                    this.removeAllFiles();
+                });
+            },
+            paramName: "imgFile",
+            maxFilesize: 2,
+            addRemoveLinks: true,
+            uploadMultiple: false,
+            dictRemoveFile: "Clear",
+            dictDefaultMessage: "Drop image here",
+            thumbnailWidth: null,
+            thumbnailHeight: 480,
+            maxThumbnailFilesize: 20,
+            acceptedFiles: ".png,.jpg,.jpeg,.bmp,.PNG,.JPG,.JPEG,.BMP"
+        }
+        function clearResponse() {
+            $('#viz').html('');
+            $('#status').html('');
+        }
+        function strToJson(str) {
+            var json = eval('(' + str + ')');
+            return json;
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html> 
+<html>
+    <head>
+        <title>Visual retrieval</title>
+    </head>
+    <body>
+    <style type="text/css">
+        .a-upload {
+            padding: 4px 10px;
+            width: 280px;
+            height: 25px;
+            line-height: 20px;
+            position: relative;
+            cursor: pointer;
+            color: #888;
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            display: inline-block;
+            *display: inline;
+            *zoom: 1
+        }
+        .a-upload  input {
+            position: absolute;
+            font-size: 80px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            filter: alpha(opacity=0);
+            cursor: pointer
+        }
+        .a-upload:hover {
+            color: #444;
+            background: #eee;
+            border-color: #ccc;
+            text-decoration: none
+        }
+        img {
+            max-width:100%;
+        } 
+    </style>
+    <!-- <div id="box" align="center">
+        <form id="uploadForm" enctype="multipart/form-data" >
+            <a href="javascript:;" class="a-upload">拍照/选择图片
+                <input type="file" name="imgFile" accept="image/*">
+            </a>
+            <input type="button" value="上传" id="upFileBtn" class="a-upload">
+        </form>
+    </div>
+    <div id="img-div" align="center"></div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" ></script>
+    <script>
+        let imgDiv = document.getElementById('img-div');
+        $('#upFileBtn').click(function () {
+            let formFile = new FormData($('#uploadForm')[0])
+            let tmStart = (new Date()).getTime(); 
+		     $.ajax({
+                url: "/img_upload",
+                type: "POST",
+                data: formFile,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    console.log(`recv: ${(new Date()).getTime()-tmStart}`);
+                    imgDiv.innerHTML=data
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.error(`${XMLHttpRequest.status},${XMLHttpRequest.readyState},${textStatus}`);
+                }
+             })
+        })
+    </script> -->
+    <div class="dropzone" id="myDropzone">
+        <div class="am-text-success dz-message">
+            将文件拖拽到此处<br>或点此打开文件管理器选择文件
+        </div>
+    </div>
+     
+    <script type="text/javascript">
+        Dropzone.autoDiscover = false;
+        var myDropzone = new Dropzone("#myDropzone", {
+            url: "/img_upload",
+            addRemoveLinks: true,
+            method: 'post',
+            filesizeBase: 1024,
+            sending: function(file, xhr, formData) {
+                formData.append("filesize", file.size);
+            },
+            success: function (file, response, e) {
+                var res = JSON.parse(response);
+                if (res.error) {
+                    $(file.previewTemplate).children('.dz-error-mark').css('opacity', '1')
+                }
+            }
+        });
+    </script>
+
+    </body>
+</html>
